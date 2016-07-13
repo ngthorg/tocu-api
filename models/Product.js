@@ -1,11 +1,11 @@
-export default function(sequelize, DataTypes) {
+export default function (sequelize, DataTypes) {
   const Product = sequelize.define('Product', {
     name: {
-      type: DataTypes.STRING
-    }
+      type: DataTypes.STRING,
+    },
   }, {
-    tableName: 'products'
+    tableName: 'products',
   });
-  
+
   return Product;
 }

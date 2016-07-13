@@ -1,51 +1,48 @@
 import DataLoader from 'dataloader';
 import {
-  User
-}
-from '../../models';
+  User,
+} from '../../models';
 
-export let userByIDLoader = new DataLoader(ids => {
-  return User.findAll({
-      where: {
-        id: {
-          $in: ids
-        }
-      }
-    })
-    .then(users => {
-      for (let user of users) {
-        userNameLoader.prime(user.userName, user);
-      }
 
-      return users;
-    });
-});
+const userNameLoader = new DataLoader(names =>
+  User.findAll({
+    where: {
+      userName: {
+        $in: names,
+      },
+    },
+  })
+  // .then(users => {
+  //   for (const user of users) {
+  //
+  //   }
+  // })
+);
 
-let userNameLoader = new DataLoader(names => {
-  return User.findAll({
-      where: {
-        userName: {
-          $in: names
-        }
-      }
-    })
-    .then(users => {
-      for (let user of users) {
+export const userByIDLoader = new DataLoader(ids =>
+  User.findAll({
+    where: {
+      id: {
+        $in: ids,
+      },
+    },
+  })
+  .then(users => {
+    for (const user of users) {
+      userNameLoader.prime(user.userName, user);
+    }
 
-      }
-    })
-});
+    return users;
+  })
+);
 
 export const allUserLoader = new DataLoader(keys => {
   console.log(keys[0]);
-  
+
   if (keys[0] !== 'allUsers' && typeof JSON.parse(keys[0]) === 'object') {
     return Promise.all([User.findAll({
-      where: JSON.parse(keys[0])
+      where: JSON.parse(keys[0]),
     })]);
   }
-  else {
-    
-    return Promise.all([User.findAll()]);
-  }
+  return Promise.all([User.findAll()]);
 });

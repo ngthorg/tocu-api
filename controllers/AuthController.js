@@ -1,39 +1,26 @@
 import uuid from 'uuid';
-
 import redis from 'redis';
+import { sendcode } from '../services/AccountKit';
+import { NotfoundError } from '../services/ErrorExtends';
+import { User } from '../models';
 
 const redisClient = redis.createClient();
 
-redisClient.on("error", function(err) {
-  console.log("Error " + err);
+redisClient.on('error', (err) => {
+  console.log(`Erro ${err}`);
 });
 
-import {
-  sendcode
-}
-from '../services/AccountKit';
-
-import {
-  NotfoundError
-}
-from '../services/ErrorExtends';
-
-import {
-  User
-}
-from '../models';
-
 /**
- * 
-{ me: 
+ *
+{ me:
    { id: 'VXNlcjo1Mg==',
      email: 'hieu22t5@gmail.com',
      name: 'Hieu',
      userName: 'hieu2223r',
      mobilePhone: '0904906903' },
-  accountKit: 
+  accountKit:
    { id: '1027480904004634',
-     phone: 
+     phone:
       { number: '+84904906903',
         country_prefix: '84',
         national_number: '904906903' } },
@@ -44,26 +31,32 @@ from '../models';
 
 const TIME_TO_LIVE = 2592000;
 
-export const authWithAccountKit = function(code, csrf_nonce) {
-  return new Promise((resolve, reject) => {
+export const foo = 'foo';
+
+export const authWithAccountKit = (code, csrfNonce) =>
+  new Promise((resolve, reject) => {
     // Gửi resquest lên accountkit.com để xác thực code
-    sendcode(code, csrf_nonce)
+    sendcode(code, csrfNonce)
       // Nếu xác thực thành công
       // Query User Account
       .then(accountKitRes => {
-        const mobilePhone = accountKitRes.phone && accountKitRes.phone.national_number ? ('0' + accountKitRes.phone.national_number) : null;
-        const email = accountKitRes.email && accountKitRes.email.address ? accountKitRes.email.address : null;
+        const mobilePhone = accountKitRes.phone && accountKitRes.phone.national_number
+          ? (`0${accountKitRes.phone.national_number}`)
+          : null;
+        const email = accountKitRes.email && accountKitRes.email.address
+          ? accountKitRes.email.address
+          : null;
 
         // Kiểm tra xem user có tồn tại trên hệ thống hay không
         return User.findOne({
-            where: {
-              $or: [{
-                mobilePhone: mobilePhone
-              }, {
-                email: email
-              }]
-            }
-          })
+          where: {
+            $or: [{
+              mobilePhone,
+            }, {
+              email,
+            }],
+          },
+        })
           .then(user => {
             // Nếu không tìm thấy user
             if (!user) {
@@ -71,17 +64,19 @@ export const authWithAccountKit = function(code, csrf_nonce) {
             }
             // Nếu tìm thấy user:
             // - Lưu vào redis
-            const access_token = uuid.v4();
+            const accessToken = uuid.v4();
 
-            let userAuthedObj = {
+            const userAuthedObj = {
               me: user,
               accountKit: accountKitRes,
-              access_token: access_token,
-              expires_in: TIME_TO_LIVE
+              access_token: accessToken,
+              expires_in: TIME_TO_LIVE,
             };
 
-            redisClient.setex(access_token, TIME_TO_LIVE, JSON.stringify(userAuthedObj), (err, res) => {
-              if (err) return reject(err);
+            redisClient.setex(accessToken, TIME_TO_LIVE, JSON.stringify(userAuthedObj), err => {
+              if (err) {
+                reject(err);
+              }
 
               resolve(userAuthedObj);
             });
@@ -90,4 +85,3 @@ export const authWithAccountKit = function(code, csrf_nonce) {
       })
       .catch(reject);
   });
-};

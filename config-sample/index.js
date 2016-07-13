@@ -1,9 +1,8 @@
-'use strict';
 const fs = require('fs');
 const path = require('path');
-let env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || 'development';
 
-fs.readdirSync(__dirname).forEach(function(file) {
+fs.readdirSync(__dirname).forEach((file) => {
   /* If its the current file ignore it */
   if (file === 'index.js') {
     return;

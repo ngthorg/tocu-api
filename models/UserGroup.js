@@ -1,14 +1,14 @@
-export default function(sequelize, DataTypes) {
+export default function (sequelize, DataTypes) {
   const UserGroup = sequelize.define('UserGroup', {
     name: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     section: {
-      type: DataTypes.STRING
-    }
+      type: DataTypes.STRING,
+    },
   }, {
-    tableName: 'user_groups'
+    tableName: 'user_groups',
   });
-  
+
   return UserGroup;
 }

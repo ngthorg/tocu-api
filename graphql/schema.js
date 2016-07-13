@@ -1,10 +1,10 @@
 import {
   GraphQLSchema,
-  GraphQLObjectType
+  GraphQLObjectType,
 } from 'graphql';
 
 import {
-  nodeField
+  nodeField,
 } from './relay/RelayNode';
 import UserQueries from './queries/User';
 
@@ -17,20 +17,20 @@ const Query = new GraphQLObjectType({
   fields: {
     node: nodeField,
     users: UserQueries,
-  }
+  },
 });
 
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
     createUser: UserCreateMutation,
-    AccountKitSendCode: AccountKitSendCodeMutation
-  }
+    AccountKitSendCode: AccountKitSendCodeMutation,
+  },
 });
 
 const Schema = new GraphQLSchema({
   query: Query,
-  mutation: Mutation
+  mutation: Mutation,
 });
 
 export default Schema;

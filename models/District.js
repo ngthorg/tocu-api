@@ -1,23 +1,23 @@
-'use strict';
-export default function(sequelize, DataTypes) {
+
+export default function (sequelize, DataTypes) {
   const District = sequelize.define('District', {
     name: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     ghnDistrictCode: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     province: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     type: DataTypes.INTEGER,
     ghnSupportType: {
-      type: DataTypes.INTEGER
-    }
+      type: DataTypes.INTEGER,
+    },
   }, {
-    timestamps: false
+    timestamps: false,
   });
 
   return District;

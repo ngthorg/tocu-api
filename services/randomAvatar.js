@@ -1,6 +1,10 @@
-module.exports = function() {
 
-  var url = [
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * ((max - min) + 1)) + min;
+}
+
+module.exports = () => {
+  const url = [
     'http://i.imgur.com/dyMUlnk.jpg',
     'http://i.imgur.com/yFkQ7UQ.jpg',
     'http://i.imgur.com/4l0pgWA.jpg',
@@ -16,12 +20,8 @@ module.exports = function() {
     'http://i.imgur.com/64QLTpI.jpg',
     'http://i.imgur.com/x8s8vKe.jpg',
     'http://i.imgur.com/V06XFu9.jpg',
-    'http://i.imgur.com/FiZEZ2m.jpg'
+    'http://i.imgur.com/FiZEZ2m.jpg',
   ];
 
   return url[getRandomInt(0, url.length - 1)];
 };
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}

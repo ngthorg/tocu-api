@@ -1,63 +1,69 @@
 import {
-  GraphQLString
-}
-from 'graphql';
+  GraphQLString,
+} from 'graphql';
 
 import {
   connectionArgs,
-  connectionFromPromisedArray
+  connectionFromPromisedArray,
 }
 from 'graphql-relay';
 
-import {
-  UserConnection
-}
-from '../connections/user';
-
-import {
-  waterfall,
-  apply
-}
-from 'async';
-
 import redis from 'redis';
+
+import {
+  UserConnection,
+} from '../connections/user';
+
 const redisClient = redis.createClient();
 
-redisClient.on("error", function(err) {
-  console.log("Error " + err);
+redisClient.on('error', (err) => {
+  console.log(`Error ${err}`);
 });
 
 // import EmailType from '../custom-types/email';
 
 // import loaders from '../loaders';
 
+
+function isAuthenticatedPromise(accessToken) {
+  return new Promise((resolve, reject) => {
+    if (!accessToken) return reject(new Error('Không có accessToken'));
+
+    return redisClient.get(accessToken, (err, reply) => {
+      if (err) return reject(err);
+      else if (!reply) return reject(new Error('Không tồn tại nhé'));
+
+      return resolve(null, JSON.parse(reply));
+    });
+  });
+}
+
 export default {
   type: UserConnection,
   args: {
     userName: {
-      type: GraphQLString
+      type: GraphQLString,
     },
     mobilePhone: {
-      type: GraphQLString
+      type: GraphQLString,
     },
     email: {
-      type: GraphQLString
+      type: GraphQLString,
     },
-    ...connectionArgs
+    ...connectionArgs,
   },
-  async resolve(_, args, {
-    loaders
-  }) {
-    let checkAccessToken = await isAuthenticatedPromise(_.access_token);
+  async resolve(_, args, { loaders }) {
+    const checkAccessToken = await isAuthenticatedPromise(_.access_token);
+    console.log(checkAccessToken);
 
     let loaderKey;
     if (args.email || args.mobilePhone || args.userName) {
       loaderKey = {};
 
-      let argObj = {
+      const argObj = {
         email: args.email,
         mobilePhone: args.mobilePhone,
-        userName: args.userName
+        userName: args.userName,
       };
 
       // Loại bỏ các props rỗng
@@ -68,24 +74,10 @@ export default {
       });
 
       loaderKey = JSON.stringify(loaderKey);
-    }
-    else {
+    } else {
       loaderKey = 'allUsers';
     }
-    
+
     return connectionFromPromisedArray(loaders.users.load(loaderKey), args);
-  }
+  },
 };
-
-function isAuthenticatedPromise(access_token) {
-  return new Promise((resolve, reject) => {
-    if (!access_token) return reject(new Error('Không có access_token'));
-
-    return redisClient.get(access_token, (err, reply) => {
-      if (err) return reject(err);
-      else if (!reply) return reject(new Error('Không tồn tại nhé'));
-
-      return resolve(null, JSON.parse(reply));
-    });
-  });
-}

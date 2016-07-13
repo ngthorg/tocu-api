@@ -8,15 +8,15 @@ const AccountKitPhoneType = new GraphQLObjectType({
   name: 'AccountKitPhone',
   fields: {
     number: {
-      type: GraphQLString
+      type: GraphQLString,
     },
     country_prefix: {
-      type: GraphQLString
+      type: GraphQLString,
     },
     national_number: {
-      type: GraphQLString
-    }
-  }
+      type: GraphQLString,
+    },
+  },
 });
 
 
@@ -25,15 +25,15 @@ const AccountKitType = new GraphQLObjectType({
   description: 'AccountKit response info',
   fields: {
     id: {
-      type: GraphQLString
+      type: GraphQLString,
     },
     phone: {
-      type: AccountKitPhoneType
+      type: AccountKitPhoneType,
     },
     email: {
-      type: GraphQLString
-    }
-  }
+      type: GraphQLString,
+    },
+  },
 });
 
 

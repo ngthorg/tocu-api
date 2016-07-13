@@ -25,5 +25,5 @@ class ProviderConnectError extends Error {
 module.exports = {
   ExistError,
   NotfoundError,
-  ProviderConnectError
+  ProviderConnectError,
 };
