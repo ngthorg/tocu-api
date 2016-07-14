@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "description": "Tổ Cú API",
   "main": "server.js",
+  "options": {
+    "mocha": "--compilers js:babel-core/register --recursive --require scripts/mocha-setup.js --check-leaks --full-trace graphql/**/__tests__/**/*-test.js"
+  },
   "scripts": {
     "start": "nodemon --exec babel-node server.js",
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha $npm_package_options_mocha",
+    "test:watch": "npm test -- --watch"
   },
   "keywords": [
     "tocu",
@@ -21,10 +25,15 @@
   "license": "ISC",
   "devDependencies": {
     "babel-eslint": "^6.1.2",
+    "chai": "^3.5.0",
+    "chai-immutable": "^1.6.0",
     "eslint": "^3.0.1",
     "eslint-config-airbnb-base": "^4.0.0",
     "eslint-plugin-import": "^1.10.3",
-    "randexp": "^0.4.2"
+    "expect": "^1.20.2",
+    "mocha": "^2.5.3",
+    "randexp": "^0.4.2",
+    "supertest": "^1.2.0"
   },
   "dependencies": {
     "async": "^2.0.0",
