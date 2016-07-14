@@ -1,67 +1,30 @@
 import { GraphQLScalarType } from 'graphql';
 import { Kind } from 'graphql/language';
 import { GraphQLError } from 'graphql/error';
-import { User } from '../../models';
 
-
-function emailValidatePromise(email) {
-  return new Promise((resolve, reject) => {
-    const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    if (!re.test(email)) {
-      const Err = new GraphQLError('Query error: Not a valid Email');
-
-      Err.type = 'TypeError';
-      console.log(Err.type);
-      reject(Err);
-    }
-
-    User.findOne({ where: { email } })
-      .then(result => {
-        if (result) {
-          reject(new Error('Email tồn tại rồi'));
-        }
-        resolve(email);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
-}
+const regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+const min = 4;
+const max = 254;
 
 const EmailType = new GraphQLScalarType({
   name: 'EmailType',
-  serialize: value => {
-    console.log(`serialize: ${value}`);
-    return value;
-  },
-  parseValue(email) {
-    return emailValidatePromise(email)
-    .then(() => email)
-    .catch(err => {
-      throw new GraphQLError(err.message);
-    });
-  },
-  parseLiteral: ast => {
-    console.log(`ast: ${ast}`);
+  serialize: value => value,
+  parseValue: value => value,
+  parseLiteral(ast) {
     if (ast.kind !== Kind.STRING) {
-      const Err = new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`, [ast]);
-      Err.type = 'TypeError';
-      throw Err;
+      throw new GraphQLError(`Query error: Can only parse strings got a: ${ast.kind}`, [ast]);
     }
-
-    // Regex taken from: http://stackoverflow.com/a/46181/761555
-    const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    if (!re.test(ast.value)) {
-      const Err = new GraphQLError('Query error: Not a valid Email', [ast]);
-
-      Err.type = 'TypeError';
-      console.log(Err.message);
-      throw Err;
+    if (ast.value.length < min) {
+      throw new GraphQLError(`Query error: minimum length of ${min} required: `, [ast]);
     }
-
+    if (ast.value.length > max) {
+      throw new GraphQLError(`Query error: maximum length is ${max}: `, [ast]);
+    }
+    if (!regex.test(ast.value)) {
+      throw new GraphQLError(`Query error: Not a valid ${'Email'}: `, [ast]);
+    }
     return ast.value;
   },
 });
-
 
 export default EmailType;
